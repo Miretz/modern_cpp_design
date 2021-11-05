@@ -49,8 +49,8 @@ public:
   }
 };
 
-int main(void) {
-  
+auto main() -> int {
+
   // simple class construction
   typedef WidgetManager<OpNewCreator> MyWidgetMgr;
   Widget *w = MyWidgetMgr::create();
