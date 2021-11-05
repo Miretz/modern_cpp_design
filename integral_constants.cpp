@@ -8,14 +8,14 @@ template <int v> struct Int2Type {
   enum { value = v };
 };
 
-// specializations - can't call with wrong type
-// compile time check
+// generic NumStruct
 template <class T> struct NumStruct {
   void func() {
     cout << "Default NumStruct of type: " << typeid(*this).name() << '\n';
   }
 };
 
+// specializations
 template <> struct NumStruct<Int2Type<2>> {
   void func() { cout << "Two struct\n"; }
 };
@@ -51,6 +51,7 @@ auto main() -> int {
   static_assert(!std::is_same<ic2_t, i2_t>::value);
   static_assert(!std::is_same<ic3_t, i3_t>::value);
 
+  // try to construct various NumStruct objects
   NumStruct<i2_t> s1;
   s1.func(); // Two struct
   NumStruct<i3_t> s2;
