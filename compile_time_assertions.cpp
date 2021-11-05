@@ -25,9 +25,9 @@ int main(void) {
   char *cs = safe_reinterpret_cast<char *>(c);
   std::cout << cs << '\n';
 
-  // error
-  char fake = safe_reinterpret_cast<char>(cs);
-  std::cout << fake << '\n';
+  // uncomment these to see the compile time error
+  // char fake = safe_reinterpret_cast<char>(cs);
+  // std::cout << fake << '\n';
 
   return 0;
 }
