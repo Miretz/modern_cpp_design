@@ -17,7 +17,7 @@ template <class To, class From> To safe_reinterpret_cast(From from) {
   return reinterpret_cast<To>(from);
 }
 
-auto main -> int {
+auto main() -> int {
 
   // no error
   char st[] = "some text\0";
