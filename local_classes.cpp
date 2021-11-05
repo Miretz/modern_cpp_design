@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <string_view>
 
 class Interface {
@@ -8,7 +9,7 @@ public:
 };
 
 template <class T, class P>
-Interface *make_adapter(const T &obj, const P &arg) {
+std::unique_ptr<Interface> make_adapter(const T &obj, const P &arg) {
   class Local : public Interface {
   public:
     Local(const T &obj, const P &arg) : obj_(obj), arg_(arg) {}
@@ -18,7 +19,7 @@ Interface *make_adapter(const T &obj, const P &arg) {
     T obj_;
     P arg_;
   };
-  return new Local(obj, arg);
+  return std::make_unique<Local>(obj, arg);
 };
 
 class Test {
@@ -33,9 +34,6 @@ auto main() -> int {
 
   auto i = make_adapter<Test, std::string_view>(original, text);
   i->fun();
-
-  delete i;
-  i = nullptr;
 
   return 0;
 }
