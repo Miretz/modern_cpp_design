@@ -4,4 +4,8 @@
 # Unignore all with extensions
 !*.*
 
+# OSX stuff
+.DS_Store
 
+# Loki library source code
+loki-0.1.7/
