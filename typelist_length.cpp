@@ -3,9 +3,8 @@
 #include "loki-0.1.7/include/loki/Typelist.h"
 
 using Loki::Typelist;
+using Loki::NullType;
 using namespace Loki::TL;
-
-class NullType {};
 
 template <class TList> struct MyLength;
 

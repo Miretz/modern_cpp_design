@@ -3,10 +3,9 @@
 
 #include "loki-0.1.7/include/loki/Typelist.h"
 
+using Loki::NullType;
 using Loki::Typelist;
 using namespace Loki::TL;
-
-class NullType {};
 
 template <class TList, class T> struct MyIndexOf;
 
