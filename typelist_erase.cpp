@@ -37,6 +37,21 @@ struct MyEraseAll<Typelist<Head, Tail>, T> {
   typedef Typelist<Head, typename MyEraseAll<Tail, T>::Result> Result;
 };
 
+// Erasing duplicates
+
+template <class TList> struct MyNoDuplicates;
+
+template <> struct MyNoDuplicates<NullType> { typedef NullType Result; };
+
+template <class Head, class Tail> struct MyNoDuplicates<Typelist<Head, Tail>> {
+private:
+  typedef typename MyNoDuplicates<Tail>::Result L1;
+  typedef typename MyErase<L1, Head>::Result L2;
+
+public:
+  typedef Typelist<Head, L2> Result;
+};
+
 // Example
 
 auto main() -> int {
@@ -50,11 +65,13 @@ auto main() -> int {
 
   typedef MyErase<MyList, signed char>::Result MyListNoChar;
   typedef MyEraseAll<MyList, int>::Result MyListNoInt;
+  typedef MyNoDuplicates<MyList>::Result MyListDedup;
 
   std::cout << "Original Length: " << Length<MyList>::value << '\n';
   std::cout << "Removed 1 type: " << Length<MyListNoChar>::value << '\n';
   std::cout << "Removed all int (2 occurences): " << Length<MyListNoInt>::value
             << '\n';
+  std::cout << "Deduplicated list: " << Length<MyListDedup>::value << '\n';
 
   return 0;
 }
