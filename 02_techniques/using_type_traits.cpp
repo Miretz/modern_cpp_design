@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "loki-0.1.7/include/loki/TypeTraits.h"
+#include "../loki-0.1.7/include/loki/TypeTraits.h"
 
 using Loki::TypeTraits;
 

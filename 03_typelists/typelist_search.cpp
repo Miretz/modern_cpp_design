@@ -1,7 +1,7 @@
 #include <iostream>
 #include <type_traits>
 
-#include "loki-0.1.7/include/loki/Typelist.h"
+#include "../loki-0.1.7/include/loki/Typelist.h"
 
 using Loki::NullType;
 using Loki::Typelist;
