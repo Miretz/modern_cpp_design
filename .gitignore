@@ -7,5 +7,8 @@
 # OSX stuff
 .DS_Store
 
+# out files
+*.out
+
 # Loki library source code
 loki-0.1.7/
