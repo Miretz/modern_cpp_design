@@ -4,7 +4,7 @@
 
 struct Chunk {
   void Init(std::size_t blockSize, unsigned char blocks) {
-    pData_ = new unsigned char[blockSize * blocks];
+    pData_ = new unsigned char[blockSize * blocks]();
     firstAvailableBlock_ = 0;
     blocksAvailable_ = blocks;
     unsigned char i = 0;
