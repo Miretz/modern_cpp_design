@@ -16,3 +16,11 @@ Some examples use the original Loki library version 0.1.7.
 Simply extract the archive under the loki-0.1.7 folder.
 
 
+
+# Other various Modern C++ resources
+
+
+- modern_cpp_metaprogramming/ folder based on this video: [Modern C++: Metaprogramming](https://youtu.be/JSR8YBhW_uM)
+
+
+
