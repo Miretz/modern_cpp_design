@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 using LoadWarningFn = void (*)(std::string_view warning);
@@ -128,11 +129,13 @@ std::string &trim_whitespace(std::string &str) {
 }
 
 template <typename... Args>
-void trigger_warning(LoadWarningFn fn, Args const &...args) {
-  std::ostringstream stream;
-  using List = int[];
-  (void)List{0, ((void)(stream << args), 0)...};
-  fn(stream.str());
+void trigger_warning(LoadWarningFn warning_fn, Args &&...params) {
+  if (warning_fn == nullptr) {
+    return;
+  }
+  std::stringstream ss;
+  [[maybe_unused]] auto _ = {(static_cast<void>(ss << std::forward<Args>(params)), 0)...};
+  (*warning_fn)(ss.str());
 }
 
 using CVarSet = std::set<std::pair<std::string, std::string>>;
