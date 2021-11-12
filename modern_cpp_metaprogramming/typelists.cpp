@@ -56,6 +56,26 @@ using AppendTypeUnique =
     std::conditional_t<ContainsType<T, Types...>, TypeList<Types...>,
                        TypeList<Types..., T>>;
 
+// convert the type list to contain only unique elements
+
+template <typename... Results>
+constexpr auto unique_type_list(TypeList<Results...>, TypeList<>)
+    -> TypeList<Results...> {
+  return {};
+}
+
+template <typename... Results, typename First, typename... Inputs>
+constexpr auto unique_type_list(TypeList<Results...>,
+                                TypeList<First, Inputs...>)
+    -> decltype(unique_type_list(AppendTypeUnique<First, Results...>{},
+                                 TypeList<Inputs...>{})) {
+  return {};
+}
+
+template <typename... Types>
+using UniqueTypeList =
+    decltype(unique_type_list(TypeList<>{}, TypeList<Types...>{}));
+
 // tests
 
 auto main() -> int {
@@ -79,6 +99,10 @@ auto main() -> int {
 
   static_assert(std::is_same_v<TypeList<bool, int, float>,
                                AppendTypeUnique<int, bool, int, float>>);
+
+  static_assert(std::is_same_v<TypeList<int, bool, double, float>,
+                               UniqueTypeList<int, bool, bool, double, int,
+                                              float, float, double, bool>>);
 
   return 0;
 }
