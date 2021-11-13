@@ -22,5 +22,6 @@ Simply extract the archive under the loki-0.1.7 folder.
 
 - modern_cpp_metaprogramming/ folder based on this video: [Modern C++: Metaprogramming](https://youtu.be/JSR8YBhW_uM)
 
+- normal/ folder based on video: [Template Normal Programming](https://www.youtube.com/watch?v=vwrXHznaYLA)
 
 
