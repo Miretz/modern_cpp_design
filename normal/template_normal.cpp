@@ -9,7 +9,7 @@ template <typename T> T abs(T x) { return (x >= 0) ? x : -x; }
 // variable template
 template <typename T> T number = T(65.21);
 
-// variable template with partial specialization
+// variable template with full specialization
 template <typename T> constexpr bool is_int = false;
 template <> constexpr bool is_int<int> = true;
 
