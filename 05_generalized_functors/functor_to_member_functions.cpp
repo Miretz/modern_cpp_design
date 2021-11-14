@@ -91,7 +91,7 @@ private:
 
 // Functor
 
-template <typename R, class TList> class Functor {
+template <typename R = void, class TList = NullType> class Functor {
 public:
   typedef TList ParmList;
   typedef R ResultType;
@@ -123,19 +123,19 @@ private:
 
 class Parrot {
 public:
-  void eat(int i) { std::cout << i << " Tsk, knick, tsk...\n"; }
-  void speak(int i) { std::cout << i << " Oh Captain, my Captain!\n"; }
+  void eat() { std::cout << "Tsk, knick, tsk...\n"; }
+  void speak() { std::cout << "Oh Captain, my Captain!\n"; }
 };
 
 auto main() -> int {
 
   Parrot geronimo;
 
-  Functor<void, LOKI_TYPELIST_1(int)> cmd1(&geronimo, &Parrot::eat);
-  Functor<void, LOKI_TYPELIST_1(int)> cmd2(&geronimo, &Parrot::speak);
+  Functor<> cmd1(&geronimo, &Parrot::eat);
+  Functor<> cmd2(&geronimo, &Parrot::speak);
 
-  cmd1(1);
-  cmd2(2);
+  cmd1();
+  cmd2();
 
   return 0;
 }
