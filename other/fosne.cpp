@@ -1,8 +1,12 @@
+#include <algorithm>
 #include <cmath>
+#include <exception>
 #include <iomanip>
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 
 // This is a very unoptimal solution
 
@@ -13,16 +17,37 @@ struct Params {
   std::pair<int, int> room;
   std::pair<int, int> tile;
   auto print() -> void {
-    cout << "room"
+    cout << "Room"
          << " (x: " << room.first << ", y:" << room.second
          << ", sq: " << (room.first * room.second) << ")\n"
-         << "tile"
+         << "Default Tile"
          << " (x: " << tile.first << ", y:" << tile.second
          << ", sq: " << (tile.first * tile.second) << ")\n"
          << "Rough estimate: "
          << std::ceil((room.first * room.second) / (tile.first * tile.second))
          << '\n';
   }
+};
+
+struct Tile {
+  std::pair<int, int> dimensions;
+
+  bool operator==(const Tile &rhs) const {
+    return dimensions == rhs.dimensions;
+  }
+
+  bool operator<(const Tile &rhs) const { return dimensions < rhs.dimensions; }
+
+  bool operator>(const Tile &rhs) const { return dimensions > rhs.dimensions; }
+
+  auto to_string() const -> std::string {
+    std::stringstream ss;
+    ss << "[" << std::left << std::setw(4) << dimensions.first << " x "
+       << std::left << std::setw(4) << dimensions.second << "]";
+    return ss.str();
+  }
+
+  auto print() const -> void { cout << to_string(); }
 };
 
 auto get_parameters() -> Params {
@@ -44,12 +69,6 @@ auto get_parameters() -> Params {
   return params;
 }
 
-auto print_tile(int width) -> void {
-  if (width == 0)
-    return;
-  cout << "[." << std::left << std::setw(4) << width << ']';
-}
-
 auto print_line() -> void { cout << std::string(30, '-') << '\n'; }
 
 auto main() -> int {
@@ -60,43 +79,106 @@ auto main() -> int {
   params.print();
   print_line();
 
-  int count_of_tiles = 0;
-  int left_over = 0;
-  int rows =
-      std::ceil(static_cast<float>(params.room.second) / params.tile.second);
+  // full tiles
+  int full_tiles_in_col =
+      std::floor(static_cast<float>(params.room.second) / params.tile.second);
+  int full_tiles_in_row =
+      std::floor(static_cast<float>(params.room.first) / params.tile.first);
 
-  for (int r = 1; r < rows + 1; r++) {
+  // slices
+  int slice_right = params.room.first - (full_tiles_in_row * params.tile.first);
+  int slice_bottom =
+      params.room.second - (full_tiles_in_col * params.tile.second);
 
-    int count_of_tiles_row = std::floor(params.room.first / params.tile.first);
-    int left_over_row =
-        params.room.first - (count_of_tiles_row * params.tile.first);
+  int rows = slice_bottom > 0 ? 1 + full_tiles_in_col : full_tiles_in_col;
+  int cols = slice_right > 0 ? 1 + full_tiles_in_row : full_tiles_in_row;
 
-    for (int i = 0; i < count_of_tiles_row; i++) {
-      print_tile(params.tile.first);
+  std::vector<std::vector<Tile>> tiles;
+  tiles.resize(rows, std::vector<Tile>(cols));
+
+  std::vector<Tile> left_over_pieces;
+
+  int used_from_left_overs = 0;
+
+  for (auto &row : tiles) {
+    for (auto &tile : row) {
+      tile.dimensions = params.tile;
+      // last tile in row
+      if (slice_right > 0 && (&tile == &row.back())) {
+        tile.dimensions.first = slice_right;
+      }
+      // last row
+      if (slice_bottom > 0 && (&row == &tiles.back())) {
+        tile.dimensions.second = slice_bottom;
+      }
+      tile.print();
+
+      if (tile.dimensions != params.tile) {
+        // if there is a sufficient left over - cut from it
+        bool found = false;
+        for (auto &lo : left_over_pieces) {
+          if (lo.dimensions.first >= tile.dimensions.first &&
+              lo.dimensions.second == tile.dimensions.second) {
+            lo.dimensions.first -= tile.dimensions.first;
+            used_from_left_overs++;
+            found = true;
+            break;
+          }
+          if (lo.dimensions.second >= tile.dimensions.second &&
+              lo.dimensions.first == tile.dimensions.first) {
+            lo.dimensions.second -= tile.dimensions.second;
+            used_from_left_overs++;
+            found = true;
+            break;
+          }
+        }
+
+        // no sufficient piece in left overs, store the cut
+        if (!found) {
+          Tile left_over{{{params.tile.first == tile.dimensions.first
+                               ? tile.dimensions.first
+                               : params.tile.first - tile.dimensions.first},
+                          {params.tile.second == tile.dimensions.second
+                               ? tile.dimensions.second
+                               : params.tile.second - tile.dimensions.second}}};
+
+          left_over_pieces.push_back(left_over);
+        }
+
+        // erase all pieces with a dimension of 0
+        left_over_pieces.erase(
+            std::remove_if(left_over_pieces.begin(), left_over_pieces.end(),
+                           [](auto &p) {
+                             return p.dimensions.first <= 0 ||
+                                    p.dimensions.second <= 0;
+                           }),
+            left_over_pieces.end());
+      }
     }
-    print_tile(left_over_row);
 
-    count_of_tiles += count_of_tiles_row;
-    left_over += left_over_row;
+    // print left overs
+    cout << "\t\t Left over: ";
+    std::set<Tile> unique_left_over(left_over_pieces.begin(),
+                                    left_over_pieces.end());
+    for (const auto &u : unique_left_over) {
+      auto count =
+          std::count(left_over_pieces.begin(), left_over_pieces.end(), u);
+      u.print();
+      cout << " x " << count << ", ";
+    }
 
-    cout << "\t\tRow: " << std::left << std::setw(4) << r
-         << " Tiles in row: " << std::left << std::setw(4) << count_of_tiles_row
-         << " Tiles total: " << std::left << std::setw(4) << count_of_tiles
-         << " Left over in row: " << std::left << std::setw(4) << left_over_row
-         << " Left over total: " << std::left << std::setw(4) << left_over;
-    cout << "\n";
+    cout << '\n';
   }
 
   print_line();
-  cout << "Number of full tiles needed: " << count_of_tiles << "\n";
 
-  while (left_over > 0) {
-    count_of_tiles++;
-    left_over -= params.tile.first;
-  }
+  auto full_tiles = full_tiles_in_col * full_tiles_in_row;
+  auto tiles_total = ((rows * cols) - used_from_left_overs);
 
-  cout << "Number of all tiles (full & cut) needed: " << count_of_tiles << '\n';
-  cout << "After placing them " << std::abs(left_over) << " cm remains.\n";
+  cout << "Full tiles needed: " << full_tiles << '\n';
+  cout << "Tiles needed (full & cut): " << tiles_total << '\n';
+
+  print_line();
 
   return 0;
 }
