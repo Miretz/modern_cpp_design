@@ -107,12 +107,20 @@ auto export_image(std::pair<int, int> image_size,
   file.open("output.ppm");
   file << "P3\n" << image_size.first << ' ' << image_size.second << "\n255\n";
 
-  for (const auto &row : tiles) {
+  bool reverse_row = false;
+  for (auto &row : tiles) {
     for (int y = 0; y < row[0].dimensions.second; y++) {
-      for (const auto &tile : row) {
-        file << tile.draw_line(y);
+      if (reverse_row) {
+        for (int i = row.size() - 1; i >= 0; --i) {
+          file << row[i].draw_line(y);
+        }
+      } else {
+        for (const auto &tile : row) {
+          file << tile.draw_line(y);
+        }
       }
     }
+    reverse_row = !reverse_row;
   }
 
   file.close();
