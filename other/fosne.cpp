@@ -1,14 +1,29 @@
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <exception>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 // Laminate flooring. Calculates the number of planks needed.
+
+inline constexpr auto black_pixel = "0 0 0\n";
+inline constexpr auto white_pixel = "255 255 255\n";
+
+inline constexpr std::array<std::string_view, 6> colors{{
+    {"145 189 241\n"},
+    {"63 218 132\n"},
+    {"221 225 132\n"},
+    {"221 225 245\n"},
+    {"255 183 247\n"},
+    {"255 155 157\n"},
+}};
 
 using std::cin;
 using std::cout;
@@ -31,6 +46,7 @@ struct Params {
 
 struct Tile {
   std::pair<int, int> dimensions;
+  std::string_view color;
 
   bool operator==(const Tile &rhs) const {
     return dimensions == rhs.dimensions;
@@ -44,6 +60,20 @@ struct Tile {
     std::stringstream ss;
     ss << "[" << std::left << std::setw(4) << dimensions.first << " x "
        << std::left << std::setw(4) << dimensions.second << "]";
+    return ss.str();
+  }
+
+  auto draw_line(int y) const -> std::string {
+    std::stringstream ss;
+    ss << black_pixel;
+    for (int x = 0; x < dimensions.first - 2; x++) {
+      if (y == (dimensions.second - 1)) {
+        ss << black_pixel;
+      } else {
+        ss << color;
+      }
+    }
+    ss << black_pixel;
     return ss.str();
   }
 
@@ -70,6 +100,23 @@ auto get_parameters() -> Params {
 }
 
 auto print_line() -> void { cout << std::string(30, '-') << '\n'; }
+
+auto export_image(std::pair<int, int> image_size,
+                  const std::vector<std::vector<Tile>> &tiles) -> void {
+  std::ofstream file;
+  file.open("output.ppm");
+  file << "P3\n" << image_size.first << ' ' << image_size.second << "\n255\n";
+
+  for (const auto &row : tiles) {
+    for (int y = 0; y < row[0].dimensions.second; y++) {
+      for (const auto &tile : row) {
+        file << tile.draw_line(y);
+      }
+    }
+  }
+
+  file.close();
+}
 
 auto main() -> int {
 
@@ -100,8 +147,12 @@ auto main() -> int {
 
   int used_from_left_overs = 0;
 
+  int index = 0;
+
   for (auto &row : tiles) {
     for (auto &tile : row) {
+      auto color = colors[index++ % colors.size()];
+      tile.color = color;
       tile.dimensions = params.tile;
       // last tile in row
       if (slice_right > 0 && (&tile == &row.back())) {
@@ -140,7 +191,8 @@ auto main() -> int {
                                : params.tile.first - tile.dimensions.first},
                           {params.tile.second == tile.dimensions.second
                                ? tile.dimensions.second
-                               : params.tile.second - tile.dimensions.second}}};
+                               : params.tile.second - tile.dimensions.second}},
+                         color};
 
           left_over_pieces.push_back(left_over);
         }
@@ -179,6 +231,12 @@ auto main() -> int {
   cout << "Uncut planks needed: " << full_tiles << '\n';
   cout << "Total planks needed (uncut & cut): " << tiles_total << '\n';
   cout << "Plus 10% to accommodate aditional waste: " << tiles_final << '\n';
+
+  print_line();
+
+  cout << "Exporting image...\n";
+  export_image(params.room, tiles);
+  cout << "DONE.\n";
 
   print_line();
 
