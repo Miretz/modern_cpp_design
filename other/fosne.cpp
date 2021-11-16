@@ -174,12 +174,11 @@ auto main() -> int {
 
   auto full_tiles = full_tiles_in_col * full_tiles_in_row;
   auto tiles_total = ((rows * cols) - used_from_left_overs);
-
   auto tiles_final = std::ceil(static_cast<double>(tiles_total) * 1.10);
 
-  cout << "Full tiles needed: " << full_tiles << '\n';
-  cout << "Tiles needed (full & cut): " << tiles_total << '\n';
-  cout << "Plus 10% to accomodate aditional waste: " << tiles_final << '\n';
+  cout << "Uncut planks needed: " << full_tiles << '\n';
+  cout << "Total planks needed (uncut & cut): " << tiles_total << '\n';
+  cout << "Plus 10% to accommodate aditional waste: " << tiles_final << '\n';
 
   print_line();
 
