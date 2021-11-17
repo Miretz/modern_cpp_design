@@ -30,4 +30,6 @@ Simply extract the archive under the loki-0.1.7 folder.
 
 - **normal/** - folder with examples based on this video: [Template Normal Programming](https://www.youtube.com/watch?v=vwrXHznaYLA)
 
+- **other/** - some other toy programs.
+
 
