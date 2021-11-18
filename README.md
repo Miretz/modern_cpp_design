@@ -22,6 +22,11 @@ Some examples use the original Loki library version 0.1.7.
 Simply extract the archive under the loki-0.1.7 folder.
 
 
+## Discovering Modern C++: An Intensive Course for Scientists, Engineers, and Programmers
+
+
+- **discovering/** - code inspired by [Discovering Modern C++](https://www.amazon.com/Discovering-Modern-Scientists-Programmers-Depth/dp/0134383583)
+
 
 ## Other Modern C++ Metaprogramming resources
 
