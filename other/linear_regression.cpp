@@ -5,8 +5,10 @@
 
 // compile-time linear regression model
 
+// compile with make due to step limit
+
 inline constexpr size_t n_values = 12;
-inline constexpr size_t n_iterations = 100'000;
+inline constexpr size_t n_iterations = 1'000'000;
 
 constexpr std::array<double, n_values> ys{890.0,  1411.0, 1560.0, 2220.0,
                                           2091.0, 2878.0, 3537.0, 3268.0,
@@ -23,7 +25,7 @@ constexpr std::array<double, n_values> xs{1.0, 2.0, 2.0, 3.0, 3.0, 4.0,
 [[nodiscard]] constexpr auto deriv1(double t0, double t1) -> double {
   auto s = 0.0;
   for (size_t i = 0; i < n_values; ++i) {
-    s = s + j(t0, t1, xs[i], ys[i]);
+    s += j(t0, t1, xs[i], ys[i]);
   }
   return (1.0 / static_cast<double>(n_values)) * s;
 }
@@ -31,7 +33,7 @@ constexpr std::array<double, n_values> xs{1.0, 2.0, 2.0, 3.0, 3.0, 4.0,
 [[nodiscard]] constexpr auto deriv2(double t0, double t1) -> double {
   auto s = 0.0;
   for (size_t i = 0; i < n_values; ++i) {
-    s = s + j(t0, t1, xs[i], ys[i]) * xs[i];
+    s += j(t0, t1, xs[i], ys[i]) * xs[i];
   }
   return (1.0 / static_cast<double>(n_values)) * s;
 }
@@ -55,7 +57,7 @@ auto predict(double x, std::pair<double, double> thetas) -> void {
 }
 
 auto run() -> void {
-  auto thetas = train();
+  constexpr auto thetas = train();
   std::cout << "Gradient descent calcuated t0 = " << thetas.first
             << ",t1 = " << thetas.second << '\n';
   for (size_t i = 0; i < n_values; ++i) {
