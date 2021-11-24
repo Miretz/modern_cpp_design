@@ -37,6 +37,8 @@ Simply extract the archive under the loki-0.1.7 folder.
 
 - **normal/** - folder with examples based on this video: [Template Normal Programming](https://www.youtube.com/watch?v=vwrXHznaYLA)
 
+- **best_practices/** - based on video: [C++ Code Smells - Jason Turner](https://youtu.be/nqfgOCU_Do4)
+
 - **other/** - some other toy programs.
 
 
