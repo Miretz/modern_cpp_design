@@ -3,11 +3,34 @@
 #include <exception>
 #include <map>
 
+// Generic Factory Error Policy - throws exception
+
+template <class IdentifierType, class ProductType> class DefaultFactoryError {
+public:
+  class Exception : public std::exception {
+    explicit Exception(const IdentifierType &unknownId)
+        : unknownId_(unknownId) {}
+    virtual const char *what() noexcept {
+      return "Unknown object type passed to Factory.";
+    }
+    const IdentifierType GetId() { return unknownId_; }
+
+  private:
+    IdentifierType unknownId_;
+  };
+
+protected:
+  static ProductType *OnUnknownType(const IdentifierType &id) {
+    throw Exception(id);
+  }
+};
+
 // Generic Factory Class
 
-template <class AbstractProduct, typename IdentifierType,
-          typename ProductCreator,
-          template <typename, class> class FactoryErrorPolicy>
+template <class AbstractProduct, class IdentifierType,
+          class ProductCreator = AbstractProduct *(*)(),
+          template <typename, class> class FactoryErrorPolicy =
+              DefaultFactoryError>
 class Factory : public FactoryErrorPolicy<IdentifierType, AbstractProduct> {
 
 public:
@@ -31,24 +54,3 @@ private:
 };
 
 
-// Generic Factory Error Policy - throws exception
-
-template <class IdentifierType, class ProductType> class DefaultFactoryError {
-public:
-  class Exception : public std::exception {
-    explicit Exception(const IdentifierType &unknownId)
-        : unknownId_(unknownId) {}
-    virtual const char *what() noexcept {
-      return "Unknown object type passed to Factory.";
-    }
-    const IdentifierType GetId() { return unknownId_; }
-
-  private:
-    IdentifierType unknownId_;
-  };
-
-protected:
-  static ProductType *OnUnknownType(const IdentifierType &id) {
-    throw Exception(id);
-  }
-};
