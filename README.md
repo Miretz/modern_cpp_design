@@ -2,6 +2,8 @@
 
 Repository of toy examples of various modern C++ programming techniques.
 
+The goal is to build a catalog of ideas and techniques from books and tutorials to use as references for my future projects.
+
 ## Modern C++ Design book
 
 Some code inspired by the book [Modern C++ Design by Andrei Alexandrescu](https://www.amazon.com/Modern-Design-Generic-Programming-Patterns/dp/0201704315)
