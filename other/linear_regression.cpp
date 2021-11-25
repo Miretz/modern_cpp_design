@@ -3,10 +3,6 @@
 #include <iostream>
 #include <random>
 
-// compile-time linear regression model
-
-// compile with make due to step limit
-
 inline constexpr size_t n_values = 12;
 inline constexpr size_t n_iterations = 1'000'000;
 
@@ -57,7 +53,7 @@ auto predict(double x, std::pair<double, double> thetas) -> void {
 }
 
 auto run() -> void {
-  constexpr auto thetas = train();
+  const auto thetas = train();
   std::cout << "Gradient descent calcuated t0 = " << thetas.first
             << ",t1 = " << thetas.second << '\n';
   for (size_t i = 0; i < n_values; ++i) {
@@ -66,7 +62,9 @@ auto run() -> void {
   }
 
   // predict some test number
-  predict(10, thetas);
+  predict(10.0, thetas);
+  predict(7.0, thetas);
+  predict(100.0, thetas);
 }
 
 auto main() -> int {
