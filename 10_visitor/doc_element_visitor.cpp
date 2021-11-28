@@ -7,8 +7,8 @@ class RasterBitmap;
 
 class DocElementVisitor {
 public:
-  virtual void VisitParagraph(Paragraph &) = 0;
-  virtual void VisitRasterBitmap(RasterBitmap &) = 0;
+  virtual void Visit(Paragraph &) = 0;
+  virtual void Visit(RasterBitmap &) = 0;
 };
 
 class DocElement {
@@ -21,7 +21,7 @@ class Paragraph : public DocElement {
   int fontSize_ = 10;
 
 public:
-  void Accept(DocElementVisitor &v) override { v.VisitParagraph(*this); }
+  void Accept(DocElementVisitor &v) override { v.Visit(*this); }
   int NumChars() { return 42; }
   int NumWords() { return 61; }
   int GetFontSize() const { return fontSize_; }
@@ -30,16 +30,16 @@ public:
 
 class RasterBitmap : public DocElement {
 public:
-  void Accept(DocElementVisitor &v) override { v.VisitRasterBitmap(*this); }
+  void Accept(DocElementVisitor &v) override { v.Visit(*this); }
 };
 
 class DocStats : public DocElementVisitor {
 public:
-  virtual void VisitParagraph(Paragraph &par) override {
+  virtual void Visit(Paragraph &par) override {
     chars_ += par.NumChars();
     words_ += par.NumWords();
   }
-  virtual void VisitRasterBitmap(RasterBitmap &) override { ++images_; }
+  virtual void Visit(RasterBitmap &) override { ++images_; }
 
   void Display() {
     std::cout << "Chars: " << chars_ << "\nWords: " << words_
@@ -55,10 +55,10 @@ private:
 // Use the visitor to add new functionalities
 class IncrementFontSize : public DocElementVisitor {
 public:
-  virtual void VisitParagraph(Paragraph &par) override {
+  virtual void Visit(Paragraph &par) override {
     par.SetFontSize(par.GetFontSize() + 1);
   }
-  virtual void VisitRasterBitmap(RasterBitmap &) override {
+  virtual void Visit(RasterBitmap &) override {
     // NOP
   }
 };
