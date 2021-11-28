@@ -2,8 +2,17 @@
 #include <memory>
 #include <vector>
 
+static constexpr auto kDefaultFontSize = 10;
+static constexpr auto kDefaultNumChars = 42;
+static constexpr auto kDefaultNumWords = 61;
+
 class DocElementVisitor {
 public:
+  DocElementVisitor() = default;
+  DocElementVisitor(const DocElementVisitor &) = delete;
+  DocElementVisitor(const DocElementVisitor &&) = delete;
+  auto operator=(DocElementVisitor &) -> DocElementVisitor & = delete;
+  auto operator=(DocElementVisitor &&) -> DocElementVisitor & = delete;
   virtual ~DocElementVisitor() = default;
 };
 
@@ -23,17 +32,17 @@ public:
 };
 
 class Paragraph : public DocElement {
-  int fontSize_ = 10;
+  int fontSize_ = kDefaultFontSize;
 
 public:
   void Accept(DocElementVisitor &v) override {
-    if (ParagraphVisitor *p = dynamic_cast<ParagraphVisitor *>(&v)) {
+    if (auto *p = dynamic_cast<ParagraphVisitor *>(&v)) {
       p->VisitParagraph(*this);
     }
   }
-  int NumChars() { return 42; }
-  int NumWords() { return 61; }
-  int GetFontSize() const { return fontSize_; }
+  auto NumChars() -> int { return kDefaultNumChars; }
+  auto NumWords() -> int { return kDefaultNumWords; }
+  auto GetFontSize() const -> int { return fontSize_; }
   void SetFontSize(int value) { fontSize_ = value; }
 };
 
@@ -49,7 +58,7 @@ public:
 class RasterBitmap : public DocElement {
 public:
   void Accept(DocElementVisitor &v) override {
-    if (RasterVisitor *p = dynamic_cast<RasterVisitor *>(&v)) {
+    if (auto *p = dynamic_cast<RasterVisitor *>(&v)) {
       p->VisitRaster(*this);
     }
   }
@@ -64,7 +73,7 @@ class DocStats : public DocElementVisitor,
                  public RasterVisitor {
 public:
   void VisitParagraph(DocElement &obj) override {
-    Paragraph *par = dynamic_cast<Paragraph *>(&obj);
+    auto *par = dynamic_cast<Paragraph *>(&obj);
     chars_ += par->NumChars();
     words_ += par->NumWords();
   }
@@ -89,7 +98,7 @@ INCREMENT FONT SIZE
 class IncrementFontSize : public DocElementVisitor, public ParagraphVisitor {
 public:
   void VisitParagraph(DocElement &obj) override {
-    Paragraph *par = dynamic_cast<Paragraph *>(&obj);
+    auto *par = dynamic_cast<Paragraph *>(&obj);
     par->SetFontSize(par->GetFontSize() + 1);
   }
 };
