@@ -40,19 +40,16 @@ typedef CyclicVisitor<void,
 class DocElement {
 public:
   DEFINE_CYCLIC_VISITABLE(MyVisitor);
-  virtual void Visit(MyVisitor &) = 0;
 };
 
 class Paragraph : public DocElement {
 public:
   DEFINE_CYCLIC_VISITABLE(MyVisitor);
-  void Visit(MyVisitor&) override { std::cout << "Hello, from Paragraph.\n"; }
 };
 
 class RasterBitmap : public DocElement {
 public:
   DEFINE_CYCLIC_VISITABLE(MyVisitor);
-  void Visit(MyVisitor&) override { std::cout << "Hello, from RasterBitmap.\n"; }
 };
 
 class MyConcreteVisitor : public MyVisitor {
@@ -69,5 +66,8 @@ auto main() -> int {
   Paragraph par;
   DocElement *d = &par;
   d->Accept(visitor);
+
+  RasterBitmap bmp;
+  bmp.Accept(visitor);
   return 0;
 }
