@@ -14,6 +14,7 @@ using Loki::Visitor;
 class DocElement;
 class Paragraph;
 class RasterBitmap;
+class VectorizedDrawing;
 
 template <typename R, class TList>
 class CyclicVisitor : public Visitor<TList, R> {
@@ -25,8 +26,8 @@ public:
   }
 };
 
-typedef CyclicVisitor<void,
-                      LOKI_TYPELIST_3(DocElement, Paragraph, RasterBitmap)>
+typedef CyclicVisitor<void, LOKI_TYPELIST_4(DocElement, Paragraph, RasterBitmap,
+                                            VectorizedDrawing)>
     MyVisitor;
 
 // clang-format off
@@ -52,12 +53,20 @@ public:
   DEFINE_CYCLIC_VISITABLE(MyVisitor);
 };
 
+class VectorizedDrawing : public DocElement {
+public:
+  DEFINE_CYCLIC_VISITABLE(MyVisitor);
+};
+
 class MyConcreteVisitor : public MyVisitor {
 public:
   void Visit(DocElement &) override { std::cout << "Visit(DocElement&) \n"; }
   void Visit(Paragraph &) override { std::cout << "Visit(Paragraph&) \n"; }
   void Visit(RasterBitmap &) override {
     std::cout << "Visit(RasterBitmap&) \n";
+  }
+  void Visit(VectorizedDrawing &) override {
+    std::cout << "Visit(VectorizedDrawing&) \n";
   }
 };
 
