@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <initializer_list>
 #include <iostream>
+#include <stdexcept>
 
 class vector {
 public:
@@ -27,16 +28,15 @@ public:
   }
 
   // Move Constructor
-  vector(vector &&v) : size_(v.size_), data_(v.data_), index_(v.index_) {
+  vector(vector &&v) : size_(v.size_), index_(v.index_) {
     delete[] data_;
     data_ = v.data_;
     v.data_ = nullptr;
     v.size_ = 0;
   }
 
-
   // Move Assignment
-  vector& operator=(vector&& src){
+  vector &operator=(vector &&src) {
     std::swap(data_, src.data_);
     return *this;
   }
@@ -49,7 +49,20 @@ public:
     }
   }
 
-  double &operator[](size_t pos) { return data_[pos]; }
+  double &operator[](size_t pos) {
+    if (pos < index_) {
+      return data_[pos];
+    }
+    throw std::out_of_range("Out of range access on vector");
+  }
+
+  double sum() const {
+    double sum = 0.0;
+    for (size_t i = 0; i < index_; i++) {
+      sum += data_[i];
+    }
+    return sum;
+  }
 
   void print() const {
     for (size_t i = 0; i < index_; ++i) {
@@ -78,6 +91,8 @@ auto main() -> int {
 
   // std::move is almost always a code smell because it leaves the original
   // reference broken
+
+  std::cout << v2.sum() << std::endl;
 
   return 0;
 }
