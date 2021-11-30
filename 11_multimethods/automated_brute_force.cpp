@@ -97,5 +97,8 @@ auto main() -> int {
   HatchingExecutor exec;
   Dispatcher::Go(*p1, *p2, exec);
 
+  delete p2;
+  delete p1;
+
   return 0;
 }
