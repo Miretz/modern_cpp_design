@@ -25,14 +25,21 @@ public:
     return *this;
   }
 
-  auto real() const -> double { return r; }
-  auto imaginary() const -> double { return i; }
+  auto real() -> double & { return r; }
+  auto imaginary() -> double & { return i; }
 
   friend std::ostream &operator<<(std::ostream &stream, const complex &c) {
     stream << '(' << c.r << ", " << c.i << ')';
     return stream;
   }
+
+  friend double &real(complex &c);
+  friend const double &real(const complex &c);
 };
+
+// accessor functions
+inline double &real(complex &c) { return c.real(); }
+inline const double &real(const complex &c) { return c.r; }
 
 double inline complex_abs(complex c) {
   return std::sqrt(c.real() * c.real() + c.imaginary() * c.imaginary());
@@ -73,6 +80,12 @@ auto main() -> int {
   c2 = c1;
 
   std::cout << c2 << std::endl;
+
+  real(c2) += 2.0;
+  std::cout << c2 << std::endl;
+
+  double r2 = real(complex(3,7)) * 2.0;
+  std::cout << r2 << std::endl;
 
   return 0;
 }
