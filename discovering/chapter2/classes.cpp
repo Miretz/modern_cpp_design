@@ -7,7 +7,7 @@ public:
   double i = 0.0;
 
   complex() = default;
-  complex(double real, double imaginary = 0.0) : r(real), i(imaginary) {}
+  explicit complex(double real, double imaginary = 0.0) : r(real), i(imaginary) {}
 
   // copy-constructor = the generated one would be better
   complex(const complex &c) : r(c.r), i(c.i) {}
@@ -32,6 +32,12 @@ public:
     stream << '(' << c.r << ", " << c.i << ')';
     return stream;
   }
+
+  // Addition operator
+  complex operator+(const complex &c2) const {
+    return complex(r + c2.r, i + c2.i);
+  }
+  complex operator+(double r2) const { return complex(r + r2, i); }
 
   friend double &real(complex &c);
   friend const double &real(const complex &c);
@@ -70,11 +76,13 @@ auto main() -> int {
   std::cout << b1 << ' ' << b2 << std::endl;
 
   // implicit constructor - to disable this mark the constructor "explicit"
-  complex c1 = 3.1;
+  // complex c1 = 3.1;
+
+  complex c1{3.1};
   std::cout << c1 << std::endl;
 
   // implicit conversion to complex type here:
-  std::cout << "|7| = " << complex_abs(7.0) << std::endl;
+  std::cout << "|7| = " << complex_abs(complex{7.0}) << std::endl;
 
   complex c2;
   c2 = c1;
@@ -84,8 +92,12 @@ auto main() -> int {
   real(c2) += 2.0;
   std::cout << c2 << std::endl;
 
-  double r2 = real(complex(3,7)) * 2.0;
+  double r2 = real(complex(3, 7)) * 2.0;
   std::cout << r2 << std::endl;
+
+  // using the operators
+  std::cout << c2 + complex(3, 0) << std::endl;
+  std::cout << c2 + 3 << std::endl;
 
   return 0;
 }
