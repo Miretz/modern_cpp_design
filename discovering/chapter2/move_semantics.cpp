@@ -28,6 +28,8 @@ public:
 
   // Move Constructor
   vector(vector &&v) : size_(v.size_), data_(v.data_), index_(v.index_) {
+    delete[] data_;
+    data_ = v.data_;
     v.data_ = nullptr;
     v.size_ = 0;
   }
@@ -68,11 +70,14 @@ auto main() -> int {
   v1.push_back(13);
   v1.print();
 
-  auto v2 = std::move(v1);
+  auto v2 = std::move(v1); // std::move only casts lvalue to rvalue
   v2[1] = 2;
 
   // v1.print(); // v1 is UD after move
   v2.print();
+
+  // std::move is almost always a code smell because it leaves the original
+  // reference broken
 
   return 0;
 }
