@@ -39,6 +39,8 @@ Simply extract the archive under the loki-0.1.7 folder.
 
 - **best_practices/** - based on video: [C++ Code Smells - Jason Turner](https://youtu.be/nqfgOCU_Do4)
 
+- **solid/** - based on the article [SOLID principles in modern C++](http://codingadventures.org/2021/11/27/solid-principles-using-modern-c/)
+
 - **other/** - some other toy programs.
 
 
