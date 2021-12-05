@@ -32,7 +32,10 @@ auto main() -> int {
 
     // std also has this - needs <numeric> and <functional> headers
     double s2 = std::accumulate(v.begin(), v.end(), 0.0, std::plus<double>{});
+    double p2 =
+        std::accumulate(v.begin(), v.end(), 1.0, std::multiplies<double>{});
     std::cout << "STL Sum: " << s2 << '\n';
+    std::cout << "STL Product: " << p2 << '\n';
 
     return 0;
 }
