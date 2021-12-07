@@ -23,7 +23,7 @@ template <typename T> class list_iterator {
     using iterator_category = std::bidirectional_iterator_tag;
 
     T &operator*() { return entry->value; }
-    const T &operator*() const { return entry->value; }
+    T &operator*() const { return entry->value; }
 
     list_iterator<T> &operator++() {
         entry = entry->next;
@@ -42,21 +42,31 @@ template <typename T> class list_iterator {
         return *this;
     }
 
-    list_iterator<T> &operator+(difference_type v) {
-        while (v > 0) {
+    list_iterator<T> &operator+(const difference_type v) {
+        auto ind = v;
+        while (ind > 0) {
             entry = entry->next;
-            v--;
+            if (entry == nullptr) {
+                break;
+            }
+            ind--;
         }
         return *this;
     }
-    list_iterator<T> &operator-(difference_type v) {
-        while (v > 0) {
+
+    list_iterator<T> &operator-(const difference_type v) {
+        auto ind = v;
+        while (ind > 0) {
             entry = entry->previous;
-            v--;
+            if (entry == nullptr) {
+                break;
+            }
+            ind--;
         }
         return *this;
     }
-    difference_type operator-(const list_iterator<T> &other) {
+
+    difference_type operator-(const list_iterator<T> &other) const {
         std::ptrdiff_t ret = 0;
         auto temp = entry;
         while (temp != other.entry) {
@@ -91,6 +101,7 @@ template <typename T> struct list {
             delete first;
             first = tmp;
         }
+        first = nullptr;
         if (last) {
             delete last;
             last = nullptr;
@@ -131,6 +142,16 @@ auto main() -> int {
     l.append(13.0f);
     l.append(99.0f);
     l.append(51.0f);
+    l.append(100.f);
+    l.append(89.f);
+    l.append(60.f);
+    l.append(5.f);
+    l.append(10.0f);
+    l.append(10.3f);
+    l.append(16.0f);
+    l.append(187.0f);
+    l.append(188.0f);
+    l.append(12.12f);
 
     for (auto i : l) {
         std::cout << i << ' ';
