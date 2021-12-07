@@ -61,5 +61,10 @@ auto main() -> int {
     l.append(7.0f);
     std::cout << "array sum = " << accumulate(l.begin(), l.end(), 0) << '\n';
 
+    for(auto i : l){
+        std::cout << i << ' ';
+    }
+    std::cout << std::endl;
+
     return 0;
 }
