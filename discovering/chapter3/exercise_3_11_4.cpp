@@ -2,63 +2,15 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <vector>
 
 template <typename T> struct list_entry {
-    explicit list_entry(const T &value) : value(value), next(0) {}
-    T value;
-    list_entry<T> *next;
-    list_entry<T> *previous;
+    explicit list_entry(const T &value)
+        : value(value), next(nullptr), previous(nullptr) {}
+    T value = 0;
+    list_entry<T> *next = nullptr;
+    list_entry<T> *previous = nullptr;
 };
-
-template <typename T> bool are_neighbors(list_entry<T> *A, list_entry<T> *B) {
-    return (A->next == B && B->previous == A) ||
-           (A->previous == B && B->next == A);
-}
-
-template <typename T> void refresh_outer(list_entry<T> *A) {
-    if (A->previous != nullptr) {
-        A->previous->next = A;
-    }
-    if (A->next != nullptr) {
-        A->next->previous = A;
-    }
-}
-
-template <typename T> void swap(list_entry<T> *A, list_entry<T> *B) {
-    list_entry<T> *swapperVector[4];
-    list_entry<T> *temp;
-
-    std::cout << "Swapping: " << A->value << " and " << B->value << std::endl;
-
-    if (A == B)
-        return;
-
-    if (B->next == A) {
-        temp = A;
-        A = B;
-        B = temp;
-    }
-
-    swapperVector[0] = A->previous;
-    swapperVector[1] = B->previous;
-    swapperVector[2] = A->next;
-    swapperVector[3] = B->next;
-
-    if (are_neighbors(A, B)) {
-        A->previous = swapperVector[2];
-        B->previous = swapperVector[0];
-        A->next = swapperVector[3];
-        B->next = swapperVector[1];
-    } else {
-        A->previous = swapperVector[1];
-        B->previous = swapperVector[0];
-        A->next = swapperVector[3];
-        B->next = swapperVector[2];
-    }
-
-    refresh_outer(A);
-    refresh_outer(B);
-}
 
 template <typename T> class list_iterator {
   public:
@@ -105,7 +57,6 @@ template <typename T> class list_iterator {
         return *this;
     }
     difference_type operator-(const list_iterator<T> &other) {
-
         std::ptrdiff_t ret = 0;
         auto temp = entry;
         while (temp != other.entry) {
@@ -155,6 +106,7 @@ template <typename T> struct list {
         } else {
             first = new list_entry<T>(x);
             first->next = last;
+            first->previous = first;
             current = first;
         }
     }
@@ -168,23 +120,24 @@ template <typename T> struct list {
 
 auto main() -> int {
 
-    // now accumulate works for both lists and arrays
-
     list<float> l;
     l.append(2.0f);
     l.append(7.0f);
     l.append(4.0f);
     l.append(1.0f);
     l.append(22.0f);
+    l.append(199.0f);
     l.append(18.0f);
     l.append(13.0f);
-    l.append(199.0f);
+    l.append(99.0f);
+    l.append(51.0f);
 
     for (auto i : l) {
         std::cout << i << ' ';
     }
     std::cout << std::endl;
 
+    // not sure why the first 3 entries are wrong and then it just works
     std::sort(l.begin(), l.end());
 
     // for each test
