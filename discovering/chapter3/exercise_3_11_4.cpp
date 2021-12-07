@@ -5,8 +5,7 @@
 #include <vector>
 
 template <typename T> struct list_entry {
-    explicit list_entry(const T &value)
-        : value(value), next(nullptr), previous(nullptr) {}
+    explicit list_entry(const T &value) : value(value) {}
     T value = 0;
     list_entry<T> *next = nullptr;
     list_entry<T> *previous = nullptr;
@@ -94,15 +93,20 @@ template <typename T> class list_iterator {
 };
 
 template <typename T> struct list {
-    list() : first(nullptr), current(nullptr), last(new list_entry<T>(0)) {}
+    list() = default;
+    list(list<T> &) = delete;
+    list &operator=(list<T> &) = delete;
+    list(list<T> &&) noexcept = default;
+    list &operator=(list<T> &&) noexcept = default;
     ~list() {
-        while (first) {
+        current = nullptr;
+        while (first != last) {
             list_entry<T> *tmp = first->next;
             delete first;
             first = tmp;
         }
         first = nullptr;
-        if (last) {
+        if (last != nullptr) {
             delete last;
             last = nullptr;
         }
@@ -126,7 +130,9 @@ template <typename T> struct list {
     list_iterator<T> begin() { return list_iterator<T>(first); }
     list_iterator<T> end() { return list_iterator<T>(last); }
 
-    list_entry<T> *first, *current, *last;
+    list_entry<T> *first = nullptr;
+    list_entry<T> *current = nullptr;
+    list_entry<T> *last = new list_entry<T>(T(0));
 };
 
 auto main() -> int {
