@@ -4,7 +4,6 @@
 #include <iostream>
 #include <tuple>
 
-
 using color = std::tuple<int, int, int>;
 
 const color kBlack{0, 0, 0};
