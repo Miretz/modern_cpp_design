@@ -1,29 +1,27 @@
 #include <iostream>
+#include <memory>
 #include <string>
+#include <utility>
 
 // various creation policies
 
 template <class T> struct OpNewCreator {
-    static T *create() { return new T; }
-};
-
-template <class T> struct MallocCreator {
-    static T *create() {
-        void *buf = std::malloc(sizeof(T));
-        if (!buf)
-            return 0;
-        return new (buf) T;
-    }
+    static auto create() -> std::unique_ptr<T> { return std::make_unique<T>(); }
 };
 
 template <class T> struct PrototypeCreator {
-    PrototypeCreator(T *pObj = 0) : pPrototype_(pObj) {}
-    T *create() { return pPrototype_ ? pPrototype_->clone() : 0; }
-    T *getPrototype() { return pPrototype_; }
-    void setPrototype(T *pObj) { pPrototype_ = pObj; }
+    PrototypeCreator() = default;
+    explicit PrototypeCreator(std::unique_ptr<T> pObj) : pPrototype_(pObj) {}
+    auto create() -> std::unique_ptr<T> {
+        return pPrototype_ ? pPrototype_->clone() : nullptr;
+    }
+    auto getPrototype() -> std::unique_ptr<T> { return pPrototype_; }
+    void setPrototype(std::unique_ptr<T> prototype) {
+        pPrototype_ = std::move(prototype);
+    }
 
   private:
-    T *pPrototype_;
+    std::unique_ptr<T> pPrototype_;
 };
 
 // class to construct
@@ -31,10 +29,14 @@ template <class T> struct PrototypeCreator {
 class Widget {
   public:
     Widget() = default;
-    Widget(std::string str) : greeting_(str){};
-    std::string greeting_ = "Hello\n";
+    explicit Widget(std::string str) : greeting_(std::move(str)){};
+
     void sayHello() { std::cout << greeting_; }
-    Widget *clone() { return new Widget(greeting_); }
+    auto clone() -> std::unique_ptr<Widget> {
+        return std::make_unique<Widget>(greeting_);
+    }
+
+    std::string greeting_ = "Hello\n";
 };
 
 // using template template parameters to create a creator
@@ -42,43 +44,33 @@ template <template <class Created> class CreationPolicy>
 class WidgetManager : public CreationPolicy<Widget> {
     // switch prototype in widget manager
   public:
-    void switchPrototype(Widget *pNewPrototype) {
+    void switchPrototype(std::unique_ptr<Widget> prototype) {
         CreationPolicy<Widget> &myPolicy = *this;
-        delete myPolicy.getPrototype();
-        myPolicy.setPrototype(pNewPrototype);
+        myPolicy.setPrototype(std::move(prototype));
     }
 };
 
 auto main() -> int {
 
     // simple class construction
-    typedef WidgetManager<OpNewCreator> MyWidgetMgr;
-    Widget *w = MyWidgetMgr::create();
+    using MyWidgetMgr = WidgetManager<OpNewCreator>;
+    auto w = MyWidgetMgr::create();
     w->sayHello();
-    delete w;
-    w = nullptr;
 
     // prototype manager
-    typedef WidgetManager<PrototypeCreator> ProtoWidgetMgr;
+    using ProtoWidgetMgr = WidgetManager<PrototypeCreator>;
 
     ProtoWidgetMgr protoMgr;
-    protoMgr.setPrototype(new Widget("Hola\n"));
+    protoMgr.setPrototype(std::make_unique<Widget>("Hola\n"));
 
-    Widget *prototypeClone = protoMgr.create();
+    auto prototypeClone = protoMgr.create();
     prototypeClone->sayHello();
 
     // use swtich prototype - compile time only works on PrototypeCreator
-    protoMgr.switchPrototype(new Widget("Guten tag\n"));
+    protoMgr.switchPrototype(std::make_unique<Widget>("Guten tag\n"));
 
-    Widget *prototype2Clone = protoMgr.create();
+    auto prototype2Clone = protoMgr.create();
     prototype2Clone->sayHello();
-
-    delete prototypeClone;
-    delete protoMgr.getPrototype();
-    delete prototype2Clone;
-
-    prototypeClone = nullptr;
-    prototype2Clone = nullptr;
 
     return 0;
 }
