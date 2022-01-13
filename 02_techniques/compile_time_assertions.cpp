@@ -1,28 +1,20 @@
 #include <iostream>
 
-template <bool> struct CompileTimeChecker { CompileTimeChecker(...); };
+template <bool> struct CompileTimeChecker { explicit CompileTimeChecker(...); };
 
 template <> struct CompileTimeChecker<false> {};
 
-// clang-format off
-#define STATIC_CHECK(expr, msg) \
-  {\
-    class ERROR_##msg{}; \
-    (void)sizeof(CompileTimeChecker<(expr) != 0>((ERROR_##msg{}))); \
-  }
-// clang-format on
-
-template <class To, class From> To safe_reinterpret_cast(From from) {
-    STATIC_CHECK(sizeof(From) <= sizeof(To), Destination_Type_Too_Narrow);
-    return reinterpret_cast<To>(from);
+template <class To, class From> auto safe_reinterpret_cast(From from) -> To {
+    static_assert(sizeof(From) <= sizeof(To), "Destination_Type_Too_Narrow");
+    return reinterpret_cast<To>(from); // NOLINT
 }
 
 auto main() -> int {
 
     // no error
-    char st[] = "some text\0";
-    void *c = safe_reinterpret_cast<void *>(st);
-    char *cs = safe_reinterpret_cast<char *>(c);
+    char st[] = "some text\0";                   // NOLINT
+    void *c = safe_reinterpret_cast<void *>(st); // NOLINT
+    char *cs = safe_reinterpret_cast<char *>(c); // NOLINT
     std::cout << cs << '\n';
 
     // uncomment these to see the compile time error
