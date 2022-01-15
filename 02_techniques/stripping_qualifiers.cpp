@@ -4,12 +4,12 @@
 // Alexandrescu's method
 
 template <typename T> class TypeTraits {
-private:
-  template <class U> struct UnConst { typedef U Result; };
-  template <class U> struct UnConst<const U> { typedef U Result; };
+  private:
+    template <class U> struct UnConst { using Result = U; };
+    template <class U> struct UnConst<const U> { using Result = U; };
 
-public:
-  typedef typename UnConst<T>::Result NonConstType;
+  public:
+    using NonConstType = typename UnConst<T>::Result;
 };
 
 // Doc Brown's Method
@@ -21,17 +21,17 @@ template <class T> using remove_const_t = typename remove_const<T>::type;
 // Example
 
 auto main() -> int {
-  typedef const char cc;
+    using cc = const char;
 
-  TypeTraits<cc>::NonConstType a; // Alexandrescu
-  remove_const_t<cc> b;           // Doc Brown
-  std::remove_const<cc>::type c;  // STL
+    TypeTraits<cc>::NonConstType a = 0; // Alexandrescu
+    remove_const_t<cc> b = 0;           // Doc Brown
+    std::remove_const<cc>::type c = 0;  // STL
 
-  a = 'a';
-  b = 'b';
-  c = 'c';
+    a = 'a';
+    b = 'b';
+    c = 'c';
 
-  std::cout << a << ' ' << b << ' ' << c << '\n';
+    std::cout << a << ' ' << b << ' ' << c << '\n';
 
-  return 0;
+    return 0;
 }
